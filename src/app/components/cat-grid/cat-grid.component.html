@@ -1,0 +1,77 @@
+<!-- 
+  CAT GRID COMPONENT
+  Displays cats in a responsive grid with:
+  - Cat image
+  - Breed information (if available)
+  - Action buttons (favorite, vote, view details)
+-->
+
+<div class="cat-grid">
+  <!-- Loop through all cats passed from parent component -->
+  @for (cat of cats(); track cat.id) {
+    <!-- Individual cat card -->
+    <mat-card class="cat-card" appearance="outlined">
+      <!-- Cat image -->
+      <img
+        mat-card-image
+        [src]="cat.url"
+        [alt]="cat.breeds?.[0]?.name || 'Cat'"
+      />
+
+      <!-- Card content section -->
+      <mat-card-content>
+        <!-- Show breed info if available -->
+        @if (cat.breeds && cat.breeds.length > 0) {
+          <div class="breed-info">
+            <h3>{{ cat.breeds[0].name }}</h3>
+            <p class="origin">{{ cat.breeds[0].origin }}</p>
+
+            <!-- Breed stats chips -->
+            <mat-chip-set>
+              <mat-chip>❤️ {{ cat.breeds[0].affection_level }}/5</mat-chip>
+              <mat-chip>🧠 {{ cat.breeds[0].intelligence }}/5</mat-chip>
+            </mat-chip-set>
+          </div>
+        } @else {
+          <!-- Fallback for random cats without breed data -->
+          <p class="no-breed">Random cat</p>
+        }
+      </mat-card-content>
+
+      <!-- Action buttons at bottom of card -->
+      <mat-card-actions align="end">
+        <!-- Favorite toggle button -->
+        <button
+          mat-icon-button
+          (click)="toggleFavorite(cat.id)"
+          [color]="isFavorite(cat.id) ? 'warn' : ''"
+        >
+          <mat-icon>{{
+            isFavorite(cat.id) ? "favorite" : "favorite_border"
+          }}</mat-icon>
+        </button>
+
+        <!-- Vote up button -->
+        <button mat-icon-button (click)="vote.emit({ id: cat.id, value: 1 })">
+          <mat-icon>thumb_up</mat-icon>
+        </button>
+
+        <!-- Vote down button -->
+        <button mat-icon-button (click)="vote.emit({ id: cat.id, value: 0 })">
+          <mat-icon>thumb_down</mat-icon>
+        </button>
+
+        <!-- View details button -->
+        <button mat-icon-button (click)="viewDetails.emit(cat.id)">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  } @empty {
+    <!-- Shown when no cats to display -->
+    <div class="empty-state">
+      <mat-icon>pets</mat-icon>
+      <p>No cats found</p>
+    </div>
+  }
+</div>

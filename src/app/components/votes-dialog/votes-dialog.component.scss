@@ -1,0 +1,259 @@
+.title-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .title-icon {
+    color: #ffd740;
+  }
+}
+
+.votes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.vote-card {
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &.upvote {
+    border-top: 4px solid #4caf50;
+  }
+
+  &.downvote {
+    border-top: 4px solid #f44336;
+  }
+
+  .vote-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: white;
+    padding: 4px 8px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    .vote-value {
+      color: #333;
+    }
+  }
+
+  img {
+    height: 180px;
+    object-fit: cover;
+    background-color: #f5f5f5;
+
+    &.loading {
+      opacity: 0.5;
+    }
+  }
+
+  .breed-name {
+    margin: 8px 0 4px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .date {
+    font-size: 0.8rem;
+    color: rgba(0, 0, 0, 0.6);
+    margin: 0;
+  }
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(0, 0, 0, 0.5);
+
+  .empty-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    color: rgba(0, 0, 0, 0.2);
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    color: #333;
+  }
+
+  p {
+    margin: 0 0 24px;
+  }
+}
+
+.summary-container {
+  padding: 24px;
+
+  .summary-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 32px;
+
+    .stat-circle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      justify-content: center;
+
+      &.upvote {
+        background: rgba(76, 175, 80, 0.1);
+        color: #4caf50;
+      }
+
+      &.downvote {
+        background: rgba(244, 67, 54, 0.1);
+        color: #f44336;
+      }
+
+      &.total {
+        background: rgba(33, 150, 243, 0.1);
+        color: #2196f3;
+      }
+
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        margin-bottom: 8px;
+      }
+
+      .stat-number {
+        font-size: 24px;
+        font-weight: 500;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+
+  .breed-breakdown {
+    margin-top: 24px;
+
+    h3 {
+      margin: 0 0 16px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .breed-vote-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      border-bottom: 1px solid #f0f0f0;
+
+      &:hover {
+        background: #f9f9f9;
+      }
+
+      .vote-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .upvote-icon {
+          color: #4caf50;
+        }
+
+        .downvote-icon {
+          color: #f44336;
+        }
+
+        .vote-date {
+          color: rgba(0, 0, 0, 0.6);
+          font-size: 14px;
+        }
+
+        .view-button,
+        .edit-button {
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+          }
+        }
+      }
+    }
+
+    .no-votes {
+      text-align: center;
+      color: rgba(0, 0, 0, 0.5);
+      padding: 24px;
+      margin: 0;
+    }
+  }
+
+  .no-breed-selected {
+    text-align: center;
+    padding: 48px 24px;
+    color: rgba(0, 0, 0, 0.5);
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      color: rgba(0, 0, 0, 0.2);
+    }
+
+    p {
+      margin: 0;
+      font-size: 16px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .summary-stats {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .breed-vote-item {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px;
+
+    .vote-info {
+      width: 100%;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+  }
+}

@@ -1,0 +1,11 @@
+.selector-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+}
+
+.breed-select {
+  flex: 1;
+  max-width: 400px;
+}

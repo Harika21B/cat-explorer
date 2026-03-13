@@ -1,0 +1,21 @@
+<div class="selector-container">
+  <mat-form-field appearance="outline" class="breed-select">
+    <mat-label>Select Cat Breed</mat-label>
+    <mat-select
+      (selectionChange)="onBreedSelected($event.value)"
+      [value]="selectedValue"
+    >
+      <mat-option value="">All Breeds</mat-option>
+
+      <!-- 
+        Dynamic Breed Options
+        - Loops through all breeds from the service
+      -->
+      @for (breed of catService.breeds(); track breed.id) {
+        <mat-option [value]="breed.id">
+          {{ breed.name }} ({{ breed.origin }})
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>

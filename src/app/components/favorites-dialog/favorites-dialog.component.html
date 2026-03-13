@@ -1,0 +1,219 @@
+<!-- 
+  FAVORITES DIALOG
+  Displays user's favorite cats with tabs for:
+  - All favorites
+  - Breed-specific favorites (when breed selected)
+  - Summary statistics
+-->
+
+<!-- Dialog Header -->
+<h2 mat-dialog-title>
+  <div class="title-content">
+    <span>Your Favorites</span>
+    <mat-icon class="title-icon">favorite</mat-icon>
+  </div>
+</h2>
+
+<!-- Dialog Content -->
+<mat-dialog-content>
+  <!-- Tab Group -->
+  <mat-tab-group (selectedTabChange)="onTabChange()">
+    <!-- ===== TAB 1: ALL FAVORITES ===== -->
+    <mat-tab
+      [label]="'All Favorites (' + catService.userFavorites().length + ')'"
+    >
+      <div class="favorites-grid">
+        <!-- Loop through all favorites -->
+        @for (fav of catService.userFavorites(); track fav.id) {
+          <mat-card class="favorite-card" appearance="outlined">
+            <!-- Favorite Image -->
+            <img
+              mat-card-image
+              [src]="getImageUrl(fav.image_id)"
+              (error)="handleImageError($event, fav.image_id)"
+              [class.loading]="isImageLoading(fav.image_id)"
+            />
+
+            <!-- Card Content -->
+            <mat-card-content>
+              <p class="breed-name">
+                {{ getBreedName(fav.image_id) || "Loading breed..." }}
+              </p>
+              <p class="date">{{ fav.created_at | date: "medium" }}</p>
+            </mat-card-content>
+
+            <!-- Action Buttons -->
+            <mat-card-actions align="end">
+              <!-- Delete button -->
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="removeFavorite(fav.id!, fav.image_id)"
+                matTooltip="Remove from favorites"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+
+              <!-- View details button -->
+              <button
+                mat-icon-button
+                (click)="viewDetails(fav.image_id)"
+                matTooltip="View details"
+              >
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        } @empty {
+          <!-- Empty state - no favorites at all -->
+          <div class="empty-state">
+            <mat-icon class="empty-icon">favorite_border</mat-icon>
+            <h3>No Favorites Yet</h3>
+            <p>Click the heart icon on any cat to add it to your favorites!</p>
+            <button mat-raised-button color="primary" (click)="close()">
+              Browse Cats
+            </button>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <!-- ===== TAB 2: BREED-SPECIFIC FAVORITES ===== -->
+    <!-- Only shown when a specific breed is selected -->
+    @if (catService.selectedBreedName() !== "All Breeds") {
+      <mat-tab [label]="'This Breed (' + breedSpecificFavorites().length + ')'">
+        <div class="favorites-grid">
+          <!-- Loop through favorites filtered by current breed -->
+          @for (fav of breedSpecificFavorites(); track fav.id) {
+            <mat-card class="favorite-card" appearance="outlined">
+              <img
+                mat-card-image
+                [src]="getImageUrl(fav.image_id)"
+                (error)="handleImageError($event, fav.image_id)"
+                [class.loading]="isImageLoading(fav.image_id)"
+              />
+
+              <mat-card-content>
+                <p class="breed-name">
+                  {{
+                    getBreedName(fav.image_id) || catService.selectedBreedName()
+                  }}
+                </p>
+                <p class="date">{{ fav.created_at | date: "medium" }}</p>
+              </mat-card-content>
+
+              <mat-card-actions align="end">
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="removeFavorite(fav.id!, fav.image_id)"
+                  matTooltip="Remove from favorites"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  (click)="viewDetails(fav.image_id)"
+                  matTooltip="View details"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          } @empty {
+            <!-- Empty state - no favorites for this breed -->
+            <div class="empty-state">
+              <mat-icon>pets</mat-icon>
+              <p>No favorites for this breed yet</p>
+            </div>
+          }
+        </div>
+      </mat-tab>
+    }
+
+    <!-- ===== TAB 3: SUMMARY STATISTICS ===== -->
+    <mat-tab label="Summary">
+      <div class="summary-container">
+        <!-- Summary Stats Cards -->
+        <div class="summary-stats">
+          <!-- Total favorites count -->
+          <div class="stat-circle total">
+            <mat-icon>favorite</mat-icon>
+            <span class="stat-number">{{
+              catService.userFavorites().length
+            }}</span>
+            <span class="stat-label">Total Favorites</span>
+          </div>
+
+          <!-- Breed-specific count (if breed selected) -->
+          @if (catService.selectedBreedName() !== "All Breeds") {
+            <div class="stat-circle breed">
+              <mat-icon>pets</mat-icon>
+              <span class="stat-number">{{
+                breedSpecificFavorites().length
+              }}</span>
+              <span class="stat-label">{{
+                catService.selectedBreedName()
+              }}</span>
+            </div>
+          }
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Favorites by Breed Detail Section -->
+        @if (catService.selectedBreedName() !== "All Breeds") {
+          <div class="breed-breakdown">
+            <h3>Favorites for {{ catService.selectedBreedName() }}</h3>
+
+            <!-- List of breed-specific favorites -->
+            @if (breedSpecificFavorites().length > 0) {
+              @for (fav of breedSpecificFavorites(); track fav.id) {
+                <div class="breed-favorite-item">
+                  <div class="favorite-info">
+                    <mat-icon class="favorite-icon">favorite</mat-icon>
+                    <span class="favorite-date">{{
+                      fav.created_at | date: "mediumDate"
+                    }}</span>
+                    <button
+                      mat-icon-button
+                      (click)="viewDetails(fav.image_id)"
+                      matTooltip="View details"
+                      class="view-button"
+                    >
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                  </div>
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="removeFavorite(fav.id!, fav.image_id)"
+                    matTooltip="Remove from favorites"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              }
+            } @else {
+              <p class="no-favorites">No favorites for this breed yet</p>
+            }
+          </div>
+        } @else {
+          <!-- Message when no breed selected -->
+          <div class="no-breed-selected">
+            <mat-icon>info</mat-icon>
+            <p>
+              Select a breed from the dropdown to see breed-specific favorite
+              statistics
+            </p>
+          </div>
+        }
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<!-- Dialog Footer -->
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

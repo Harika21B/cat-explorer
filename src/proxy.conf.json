@@ -1,0 +1,11 @@
+{
+  "/api": {
+    "target": "https://api.thecatapi.com",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": "/v1"
+    },
+    "logLevel": "debug"
+  }
+}

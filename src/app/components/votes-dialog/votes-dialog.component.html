@@ -1,0 +1,286 @@
+<!-- 
+  VOTES DIALOG
+  Displays user's votes with tabs for:
+  - All votes (grid view with upvote/downvote styling)
+  - Breed-specific votes (when breed selected)
+  - Summary statistics (upvote/downvote counts)
+-->
+
+<!-- Dialog Header with Refresh Button -->
+<h2 mat-dialog-title>
+  <div class="title-content">
+    <span>Your Votes</span>
+    <mat-icon class="title-icon">how_to_vote</mat-icon>
+  </div>
+</h2>
+
+<!-- Dialog Content -->
+<mat-dialog-content>
+  <!-- Tab Group -->
+  <mat-tab-group (selectedTabChange)="onTabChange()">
+    <!-- ===== TAB 1: ALL VOTES ===== -->
+    <mat-tab [label]="'All Votes (' + catService.userVotes().length + ')'">
+      <div class="votes-grid">
+        <!-- Loop through all votes -->
+        @for (vote of catService.userVotes(); track vote.id) {
+          <mat-card
+            class="vote-card"
+            appearance="outlined"
+            [class.upvote]="vote.value === 1"
+            [class.downvote]="vote.value === 0"
+          >
+            <!-- Vote badge showing upvote/downvote status -->
+            <div class="vote-badge">
+              <mat-icon>{{
+                vote.value === 1 ? "thumb_up" : "thumb_down"
+              }}</mat-icon>
+              <span class="vote-value">{{
+                vote.value === 1 ? "Upvoted" : "Downvoted"
+              }}</span>
+            </div>
+
+            <!-- Cat image -->
+            <img
+              mat-card-image
+              [src]="getImageUrl(vote.image_id)"
+              (error)="handleImageError($event, vote.image_id)"
+              [class.loading]="isImageLoading(vote.image_id)"
+              alt="Cat image"
+            />
+
+            <!-- Card content with breed and date -->
+            <mat-card-content>
+              <p class="breed-name">
+                {{ getBreedName(vote.image_id) || "Loading breed..." }}
+              </p>
+              <p class="date">{{ vote.created_at | date: "medium" }}</p>
+            </mat-card-content>
+
+            <!-- Action buttons -->
+            <mat-card-actions align="end">
+              <!-- Edit vote button -->
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="editVote(vote)"
+                matTooltip="Edit vote"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <!-- Delete vote button -->
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="deleteVote(vote.id!, vote.image_id)"
+                matTooltip="Delete vote"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+              <!-- View details button -->
+              <button
+                mat-icon-button
+                (click)="viewDetails(vote.image_id)"
+                matTooltip="View details"
+              >
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        } @empty {
+          <!-- Empty state - no votes at all -->
+          <div class="empty-state">
+            <mat-icon class="empty-icon">how_to_vote</mat-icon>
+            <h3>No Votes Yet</h3>
+            <p>Vote for cats using the thumbs up/down buttons!</p>
+            <button mat-raised-button color="primary" (click)="close()">
+              Browse Cats
+            </button>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <!-- ===== TAB 2: BREED-SPECIFIC VOTES ===== -->
+    <!-- Only shown when a specific breed is selected -->
+    @if (catService.selectedBreedName() !== "All Breeds") {
+      <mat-tab [label]="'This Breed (' + breedSpecificVotes().length + ')'">
+        <div class="votes-grid">
+          <!-- Loop through votes filtered by current breed -->
+          @for (vote of breedSpecificVotes(); track vote.id) {
+            <mat-card
+              class="vote-card"
+              appearance="outlined"
+              [class.upvote]="vote.value === 1"
+              [class.downvote]="vote.value === 0"
+            >
+              <!-- Vote badge -->
+              <div class="vote-badge">
+                <mat-icon>{{
+                  vote.value === 1 ? "thumb_up" : "thumb_down"
+                }}</mat-icon>
+                <span class="vote-value">{{
+                  vote.value === 1 ? "Upvoted" : "Downvoted"
+                }}</span>
+              </div>
+
+              <!-- Cat image -->
+              <img
+                mat-card-image
+                [src]="getImageUrl(vote.image_id)"
+                (error)="handleImageError($event, vote.image_id)"
+                [class.loading]="isImageLoading(vote.image_id)"
+                alt="Cat image"
+              />
+
+              <!-- Card content -->
+              <mat-card-content>
+                <p class="breed-name">
+                  {{
+                    getBreedName(vote.image_id) ||
+                      catService.selectedBreedName()
+                  }}
+                </p>
+                <p class="date">{{ vote.created_at | date: "medium" }}</p>
+              </mat-card-content>
+
+              <!-- Action buttons -->
+              <mat-card-actions align="end">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="editVote(vote)"
+                  matTooltip="Edit vote"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="deleteVote(vote.id!, vote.image_id)"
+                  matTooltip="Delete vote"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  (click)="viewDetails(vote.image_id)"
+                  matTooltip="View details"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          } @empty {
+            <!-- Empty state - no votes for this breed -->
+            <div class="empty-state">
+              <mat-icon>pets</mat-icon>
+              <p>No votes for this breed yet</p>
+            </div>
+          }
+        </div>
+      </mat-tab>
+    }
+
+    <!-- ===== TAB 3: SUMMARY STATISTICS ===== -->
+    <mat-tab label="Summary">
+      <div class="summary-container">
+        <!-- Summary Stats Cards -->
+        <div class="summary-stats">
+          <!-- Upvote count -->
+          <div class="stat-circle upvote">
+            <mat-icon>thumb_up</mat-icon>
+            <span class="stat-number">{{ upvoteCount() }}</span>
+            <span class="stat-label">Upvotes</span>
+          </div>
+
+          <!-- Downvote count -->
+          <div class="stat-circle downvote">
+            <mat-icon>thumb_down</mat-icon>
+            <span class="stat-number">{{ downvoteCount() }}</span>
+            <span class="stat-label">Downvotes</span>
+          </div>
+
+          <!-- Total votes count -->
+          <div class="stat-circle total">
+            <mat-icon>how_to_vote</mat-icon>
+            <span class="stat-number">{{ catService.userVotes().length }}</span>
+            <span class="stat-label">Total Votes</span>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Votes by Breed Detail Section -->
+        @if (catService.selectedBreedName() !== "All Breeds") {
+          <div class="breed-breakdown">
+            <h3>Votes for {{ catService.selectedBreedName() }}</h3>
+
+            <!-- List of breed-specific votes -->
+            @if (breedSpecificVotes().length > 0) {
+              @for (vote of breedSpecificVotes(); track vote.id) {
+                <div class="breed-vote-item">
+                  <div class="vote-info">
+                    <!-- Vote icon with conditional color -->
+                    <mat-icon
+                      [class.upvote-icon]="vote.value === 1"
+                      [class.downvote-icon]="vote.value === 0"
+                    >
+                      {{ vote.value === 1 ? "thumb_up" : "thumb_down" }}
+                    </mat-icon>
+                    <!-- Vote date -->
+                    <span class="vote-date">{{
+                      vote.created_at | date: "mediumDate"
+                    }}</span>
+                    <!-- Action buttons -->
+                    <button
+                      mat-icon-button
+                      (click)="viewDetails(vote.image_id)"
+                      matTooltip="View details"
+                      class="view-button"
+                    >
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      (click)="editVote(vote)"
+                      matTooltip="Edit vote"
+                      class="edit-button"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                  </div>
+                  <!-- Delete button -->
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="deleteVote(vote.id!, vote.image_id)"
+                    matTooltip="Delete vote"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              }
+            } @else {
+              <p class="no-votes">No votes for this breed yet</p>
+            }
+          </div>
+        } @else {
+          <!-- Message when no breed selected -->
+          <div class="no-breed-selected">
+            <mat-icon>info</mat-icon>
+            <p>
+              Select a breed from the dropdown to see breed-specific vote
+              statistics
+            </p>
+          </div>
+        }
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<!-- Dialog Footer -->
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

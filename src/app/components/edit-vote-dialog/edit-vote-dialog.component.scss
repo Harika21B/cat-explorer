@@ -1,0 +1,35 @@
+.vote-edit-container {
+  min-width: 300px;
+  padding: 16px 0;
+}
+
+.upvote-text {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.downvote-text {
+  color: #f44336;
+  font-weight: 500;
+}
+
+.vote-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+
+  mat-radio-button {
+    .thumb-up {
+      color: #4caf50;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    .thumb-down {
+      color: #f44336;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+  }
+}

@@ -1,0 +1,53 @@
+<!-- 
+  EDIT VOTE DIALOG
+  Allows users to change their vote from upvote to downvote or vice versa
+-->
+
+<!-- Dialog Title -->
+<h2 mat-dialog-title>Edit Vote</h2>
+
+<!-- Dialog Content -->
+<mat-dialog-content>
+  <div class="vote-edit-container">
+    <!-- Current vote display -->
+    <p>
+      <strong>Current vote:</strong>
+      <span
+        [class.upvote-text]="data.vote.value === 1"
+        [class.downvote-text]="data.vote.value === 0"
+      >
+        <!-- Show text based on current vote value -->
+        {{ data.vote.value === 1 ? "Upvoted" : "Downvoted" }}
+      </span>
+    </p>
+
+    <!-- Radio buttons for vote selection -->
+    <mat-radio-group [(ngModel)]="selectedValue" class="vote-radio-group">
+      <!-- Upvote option -->
+      <mat-radio-button [value]="1" color="primary">
+        <mat-icon class="thumb-up">thumb_up</mat-icon> Upvote
+      </mat-radio-button>
+
+      <!-- Downvote option -->
+      <mat-radio-button [value]="0" color="warn">
+        <mat-icon class="thumb-down">thumb_down</mat-icon> Downvote
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+</mat-dialog-content>
+
+<!-- Dialog Actions (buttons at bottom) -->
+<mat-dialog-actions align="end">
+  <!-- Cancel button - closes without saving -->
+  <button mat-button (click)="cancel()">Cancel</button>
+
+  <!-- Save button - only enabled if vote actually changed -->
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="save()"
+    [disabled]="!hasChanged()"
+  >
+    Save Changes
+  </button>
+</mat-dialog-actions>

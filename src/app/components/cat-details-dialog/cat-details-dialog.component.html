@@ -1,0 +1,156 @@
+<!-- Cat Details Dialog - Shows full information about a selected cat -->
+<div class="details-dialog">
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Loading cat details...</p>
+    </div>
+  } @else {
+    <!-- Image Section -->
+    <div class="image-container">
+      <img
+        [src]="catDetails?.url"
+        (error)="handleImageError($event)"
+        alt="Cat"
+      />
+      <!-- Close button -->
+      <button mat-icon-button class="close-button" (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content-container">
+      <!-- Breed Header -->
+      <div class="header">
+        <h2>{{ breedName || "Unknown Breed" }}</h2>
+        <p class="origin">{{ origin || "Origin unknown" }}</p>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Description -->
+      <div class="description">
+        <h3>Description</h3>
+        <p>{{ description || "No description available for this cat." }}</p>
+      </div>
+
+      <!-- Temperament Chips -->
+      @if (temperament) {
+        <div class="temperament">
+          <h3>Temperament</h3>
+          <mat-chip-set>
+            @for (trait of temperament.split(","); track trait) {
+              <mat-chip>{{ trait.trim() }}</mat-chip>
+            }
+          </mat-chip-set>
+        </div>
+      }
+
+      <!-- Statistics Grid -->
+      <div class="stats-grid">
+        <!-- Life Span -->
+        @if (lifeSpan) {
+          <div class="stat-item">
+            <mat-icon>schedule</mat-icon>
+            <div>
+              <span class="stat-label">Life Span</span>
+              <span class="stat-value">{{ lifeSpan }} years</span>
+            </div>
+          </div>
+        }
+
+        <!-- Adaptability -->
+        @if (adaptability) {
+          <div class="stat-item">
+            <mat-icon>insights</mat-icon>
+            <div>
+              <span class="stat-label">Adaptability</span>
+              <span class="stat-value">{{ adaptability }}/5</span>
+            </div>
+          </div>
+        }
+
+        <!-- Affection Level -->
+        @if (affectionLevel) {
+          <div class="stat-item">
+            <mat-icon>favorite</mat-icon>
+            <div>
+              <span class="stat-label">Affection Level</span>
+              <span class="stat-value">{{ affectionLevel }}/5</span>
+            </div>
+          </div>
+        }
+
+        <!-- Child Friendly -->
+        @if (childFriendly) {
+          <div class="stat-item">
+            <mat-icon>child_care</mat-icon>
+            <div>
+              <span class="stat-label">Child Friendly</span>
+              <span class="stat-value">{{ childFriendly }}/5</span>
+            </div>
+          </div>
+        }
+
+        <!-- Dog Friendly -->
+        @if (dogFriendly) {
+          <div class="stat-item">
+            <mat-icon>pets</mat-icon>
+            <div>
+              <span class="stat-label">Dog Friendly</span>
+              <span class="stat-value">{{ dogFriendly }}/5</span>
+            </div>
+          </div>
+        }
+
+        <!-- Energy Level -->
+        @if (energyLevel) {
+          <div class="stat-item">
+            <mat-icon>battery_charging_full</mat-icon>
+            <div>
+              <span class="stat-label">Energy Level</span>
+              <span class="stat-value">{{ energyLevel }}/5</span>
+            </div>
+          </div>
+        }
+
+        <!-- Intelligence -->
+        @if (intelligence) {
+          <div class="stat-item">
+            <mat-icon>psychology</mat-icon>
+            <div>
+              <span class="stat-label">Intelligence</span>
+              <span class="stat-value">{{ intelligence }}/5</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Wikipedia Link -->
+      @if (wikipediaUrl) {
+        <div class="wiki-link">
+          <a
+            [href]="wikipediaUrl"
+            target="_blank"
+            mat-raised-button
+            color="primary"
+          >
+            <mat-icon>open_in_new</mat-icon>
+            Learn More on Wikipedia
+          </a>
+        </div>
+      }
+
+      <!-- Action Buttons -->
+      <div class="actions">
+        <button mat-button (click)="close()">Close</button>
+        <button mat-raised-button color="accent" (click)="toggleFavorite()">
+          <mat-icon>{{ isFavorite ? "favorite" : "favorite_border" }}</mat-icon>
+          {{ isFavorite ? "Favorited" : "Add to Favorites" }}
+        </button>
+      </div>
+    </div>
+  }
+</div>
