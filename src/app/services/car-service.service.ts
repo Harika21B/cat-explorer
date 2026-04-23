@@ -55,7 +55,7 @@ export interface Favorite {
 export class CarServiceService {
   // ===== DEPENDENCIES =====
   private http = inject(HttpClient);
-  private baseUrl = '/api';
+  private baseUrl = 'https://api.thecatapi.com/v1';
   private apiKey = environment.catApiKey;
   private snackBar = inject(MatSnackBar, { optional: true });
 
